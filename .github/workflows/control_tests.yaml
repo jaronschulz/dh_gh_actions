@@ -5,6 +5,8 @@ jobs:
   qa:
     name: Check tests
     runs-on: ubuntu-20.04
+    permissions:
+      contents: write
     steps:
       - name: Checkout on master
         uses: actions/checkout@v3
@@ -21,7 +23,18 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest
+          pytest >> log_pytest.txt
 
-      - name: Run flake8
-        uses: py-actions/flake8@v2
+      - name: Run flake8 and save results
+        run: |
+          flake8 . >> log_pytest.txt
+
+      - name: Push logs to repository
+        run: |
+          git config --global user.email "my-bot@bot.com"
+          git config --global user.name "my-bot"
+          git remote add origin "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git"
+          git add log_pytest.txt
+          git commit -m "Add test and flake8 logs"
+          git push
+
