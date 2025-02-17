@@ -27,7 +27,8 @@ jobs:
 
       - name: Run flake8 and save results
         run: |
-          flake8 . >> log_pytest.txt
+          flake8 . || true
+          flake8 . >> log_pytest.txt 2>&1
 
       - name: Push logs to repository
         run: |
